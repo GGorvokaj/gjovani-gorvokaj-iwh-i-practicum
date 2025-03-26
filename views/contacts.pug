@@ -1,27 +1,15 @@
-doctype html
-html
-  head
-    title= Custom Object Table
-    meta(name="viewport" content="width=device-width, initial-scale=1")
-    link(rel="stylesheet", href="/css/style.css")
-  body
-    h1= Custom Object Table
+//- ** This is a sample of a pug template and how it uses the data passed to it from index.js.
 
-    form(action="/update-cobj", method="POST")
-      div
-        label(for="game_name") Game Name:
-        input(type="text", name="game_name", required)
-
-      div
-        label(for="publisher") Publisher:
-        input(type="text", name="publisher", required)
-
-      div
-        label(for="price") Price:
-        input(type="number", name="price", required)
-
-      div
-        button(type="submit") Submit
-
-    br
-    a(href="/") Return to the homepage
+//- doctype html
+//- html 
+//-     head 
+//-         title= `${title}`
+//-         meta(name="viewport" content="width=device-width, initial-scale=1")
+//-         link(rel="stylesheet", href="/css/style.css")
+//-     body    
+//-         h1 Contacts
+//-         .cards 
+//-             each contact in data
+//-                 .card 
+//-                     h2.card__name #{contact.properties.firstname}  #{contact.properties.lastname}
+//-                     p.card__email #{contact.properties.email}

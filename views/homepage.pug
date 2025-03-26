@@ -1,0 +1,28 @@
+doctype html
+html
+  head
+    title= title
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="/css/style.css")
+  body
+    h1= title
+
+    a(href="/update-cobj") Add/Update this table
+    br
+    br
+
+    if records.length
+      table(border="1" cellspacing="0" cellpadding="8")
+        thead(style="background-color: pink; font-weight: bold;")
+          tr
+            th Name
+            th Publisher
+            th Price
+        tbody
+          each record in records
+            tr
+              td= record.properties.game_name || '_'
+              td= record.properties.publisher || '_'
+              td= record.properties.price || '_'
+    else
+      p No records found.

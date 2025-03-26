@@ -16,22 +16,34 @@ const CUSTOM_OBJECT_TYPE = process.env.CUSTOM_OBJECT_TYPE;
 // TODO: ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
 
 app.get("/", async (req, res) => {
-    const endpoint = `https://api.hubapi.com/crm/v3/objects/${CUSTOM_OBJECT_TYPE}`;
+    const endpoint = `https://api.hubapi.com/crm/v3/objects/${CUSTOM_OBJECT_TYPE}?properties=game_name,publisher,price`;
     const headers = {
-        Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-        'Content-Type': 'application/json'
+      Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+      'Content-Type': 'application/json'
     };
-
+  
     try {
-        const resp = await axios.get(endpoint, { headers });
-        const data = resp.data.results;
-        res.render('homepage', { title: 'Custom Object Table', records: data });
+      const resp = await axios.get(endpoint, { headers });
+      const allRecords = resp.data.results;
+  
+      const data = allRecords.filter(record =>
+        record.properties &&
+        record.properties.game_name &&
+        record.properties.publisher &&
+        record.properties.price
+      )
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+      console.log("✅ Filtered records:", data);
+      res.render('homepage', { title: 'Custom Object Table', records: data });
     } catch (err) {
-        console.error("Error fetching records:", err.response?.data || err.message);
-        res.status(500).send("Error fetching custom object records");
+      console.error("❌ Error fetching records:", err.response?.data || err.message);
+      res.status(500).send("Error fetching custom object records");
     }
-});
-
+  });
+  
+  
+  
 // TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
 
 app.get("/update-cobj", (req, res) => {
@@ -44,29 +56,35 @@ app.get("/update-cobj", (req, res) => {
 
 app.post("/update-cobj", async (req, res) => {
     const { game_name, publisher, price } = req.body;
-
+  
+    console.log("🔧 Form data received:", req.body);
+  
     const endpoint = `https://api.hubapi.com/crm/v3/objects/${CUSTOM_OBJECT_TYPE}`;
     const headers = {
-        Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-        'Content-Type': 'application/json'
+      Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+      'Content-Type': 'application/json'
     };
-
+  
     const newRecord = {
-        properties: {
-            game_name,
-            publisher,
-            price: parseFloat(price)
-        }
+      properties: {
+        game_name,
+        publisher,
+        price: parseFloat(price)
+      }
     };
-
+  
+    console.log("📤 Sending to HubSpot:", newRecord);
+  
     try {
-        await axios.post(endpoint, newRecord, { headers });
-        res.redirect("/");
+      const response = await axios.post(endpoint, newRecord, { headers });
+      console.log("✅ Record created:", response.data);
+      res.redirect("/");
     } catch (err) {
-        console.error("Error creating record:", err.response?.data || err.message);
-        res.status(500).send("Error creating custom object record");
+      console.error("❌ Error creating record:", err.response?.data || err.message);
+      res.status(500).send("Error creating custom object record");
     }
-});
+  });
+  
 
 
 /** 
